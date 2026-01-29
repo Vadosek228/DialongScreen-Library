@@ -9,13 +9,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vadson40.phonelib.components.buttons.icons.DialPadIconButton
@@ -23,8 +27,13 @@ import com.vadson40.phonelib.components.buttons.icons.DialPadIconButtonVO
 import com.vadson40.phonelib.components.buttons.numbers.DialPadButton
 import com.vadson40.phonelib.components.textfields.DialPadPhoneInputField
 import com.vadson40.phonelib.theme.PhoneDialPadLibraryTheme
-import com.vadson40.phonelib.utils.PhoneMaskTransformation
+import com.vadson40.phonelib.utils.Constants
+import com.vadson40.phonelib.utils.defaultIconButtonsList
 import com.vadson40.phonelib.utils.defaultNumberList
+
+//todo поправить доку
+//todo поправить работу с индикатором
+//todo поправить preview для Main activity чтобы работала иконка
 
 /**
  * Экран для набора номера.
@@ -32,97 +41,120 @@ import com.vadson40.phonelib.utils.defaultNumberList
  * Содержит два элемента:
  * 1) Поле ввода номера телефона, которое поддерживает работу с курсором, вставку, вырезать и выделить все элементы.
  * 2) Панель для ввода чисел и символов.
- *
- * @author Akulinin Vladislav
- * @since 21.01.2026
  */
 @Composable
 fun PhoneDialPadScreen(
-//    numberPanel: (@Composable ColumnScope.() -> Unit)? = null
+    modifier: Modifier = Modifier,
+    inputFieldModifier: Modifier = Modifier,
+    dialPadModifier: Modifier = Modifier,
+    buttonModifier: Modifier = Modifier,
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    inputFieldTextStyle: TextStyle? = null,
+    setInitFocus: Boolean = true,
+    visualTransformation: VisualTransformation? = null,
+    useDefaultVisualTransformation: Boolean = true,
+    cursorBrush: SolidColor? = null,
+    buttonNumberList: List<String>? = null,
+    buttonIconList: List<DialPadIconButtonVO?>? = null,
+    buttonNumberBackground: Color? = null,
+    buttonNumberIndicator: Color? = null,
+    buttonNumberTextStyle: TextStyle? = null,
+    buttonNumberClick: (String) -> Unit,
+    buttonIconClick: (Int) -> Unit
 ) {
-
-
     Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .then(modifier),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
 
             DialPadPhoneInputField(
-                value = TextFieldValue("9999999999"),
-                onValueChange = {}
+                modifier = inputFieldModifier,
+                value = value,
+                onValueChange = onValueChange,
+                textStyle = inputFieldTextStyle,
+                setInitFocus = setInitFocus,
+                visualTransformation = visualTransformation,
+                useDefaultVisualTransformation = useDefaultVisualTransformation,
+                cursorBrush = cursorBrush
             )
 
             DialPadPanel(
-                numberClick = {
-
-                }
+                modifier = dialPadModifier,
+                buttonModifier = buttonModifier,
+                buttonNumberList = buttonNumberList ?: defaultNumberList(),
+                buttonNumberBackground = buttonNumberBackground,
+                buttonNumberIndicator = buttonNumberIndicator,
+                buttonNumberTextStyle = buttonNumberTextStyle,
+                buttonIconList = buttonIconList ?: defaultIconButtonsList(),
+                buttonNumberClick = buttonNumberClick,
+                buttonIconClick = buttonIconClick
             )
         }
     }
 }
 
+/**
+ * Панель со списком кнопок для ввода номера.
+ * Также содержит кнопки с иконками, возможно использовать свои.
+ *
+ * @param modifier - модификатор для панели
+ * @param buttonModifier - модификатор для кнопок
+ * @param buttonNumberList - список кнопок с числами или символами
+ * @param buttonNumberBackground - цвет кнопки с числом или символом
+ * @param buttonNumberIndicator - цвет индикатора нажатия кнопки
+ * @param buttonNumberTextStyle - стиль текста для кнопки с числом или символом
+ * @param buttonIconList - список кнопок с иконками
+ * @param buttonNumberClick - обработчик клика по кнопке с номером, вернет символ для кнопки
+ * @param buttonIconClick - обработчик клика по кнопке с иконкой, вернет индекс кнопки
+ */
 @Composable
 private fun DialPadPanel(
-    firstIcon: DialPadIconButtonVO? = null,
-    secondIcon: DialPadIconButtonVO? = DialPadIconButtonVO.call,
-    thirdIcon: DialPadIconButtonVO? = DialPadIconButtonVO.delete,
-    numberClick: (String) -> Unit,
-    firstIconClick: (() -> Unit)? = null,
-    secondIconClick: (() -> Unit)? = null,
-    thirdIconClick: (() -> Unit)? = null
+    modifier: Modifier,
+    buttonModifier: Modifier,
+    buttonNumberList: List<String>,
+    buttonNumberBackground: Color? = null,
+    buttonNumberIndicator: Color? = null,
+    buttonNumberTextStyle: TextStyle? = null,
+    buttonIconList: List<DialPadIconButtonVO?>,
+    buttonNumberClick: (String) -> Unit,
+    buttonIconClick: (Int) -> Unit
 ) {
-    val listNumber = defaultNumberList()
     Column {
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .padding(24.dp)
+                .then(modifier),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            items(listNumber) { char ->
-                //todo продмать как цвет передавать
+            items(buttonNumberList) { char ->
                 DialPadButton(
+                    modifier = modifier,
                     label = char,
+                    backgroundColor = buttonNumberBackground,
+                    indicatorColor = buttonNumberIndicator,
+                    textStyle = buttonNumberTextStyle,
                     onClick = {
-                        numberClick(char)
+                        buttonNumberClick(char)
                     }
                 )
             }
 
-            item {
-                firstIcon?.let { data ->
+            itemsIndexed(buttonIconList) { index, item ->
+                item?.let {
                     DialPadIconButton(
-                        data = data,
+                        modifier = buttonModifier,
+                        data = item,
                         onClick = {
-                            firstIconClick?.invoke()
-                        }
-                    )
-                }
-            }
-
-            item {
-                secondIcon?.let { data ->
-                    DialPadIconButton(
-                        data = data,
-                        onClick = {
-                            secondIconClick?.invoke()
-                        }
-                    )
-                }
-            }
-
-            item {
-                thirdIcon?.let { data ->
-                    DialPadIconButton(
-                        data = data,
-                        onClick = {
-                            thirdIconClick?.invoke()
+                            buttonIconClick.invoke(index)
                         }
                     )
                 }
@@ -136,6 +168,18 @@ private fun DialPadPanel(
 @Composable
 private fun PhoneDialPadScreenPreview() {
     PhoneDialPadLibraryTheme {
-        PhoneDialPadScreen()
+        var currentInputText = remember { TextFieldValue(Constants.EMPTY) }
+        PhoneDialPadScreen(
+            value = currentInputText,
+            onValueChange = { newValue ->
+                currentInputText = newValue
+            },
+            buttonNumberClick = {
+
+            },
+            buttonIconClick = {
+
+            }
+        )
     }
 }

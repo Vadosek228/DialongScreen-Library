@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.vadson40.phonelib.PhoneDialPadScreen
 import com.vadson40.phonenumberexample.ui.theme.PhoneNumberExampleTheme
@@ -21,7 +23,19 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PhoneNumberExampleTheme {
-                PhoneDialPadScreen()
+                var currentInputText = remember { TextFieldValue("") }
+                PhoneDialPadScreen(
+                    value = currentInputText,
+                    onValueChange = { newValue ->
+                        currentInputText = newValue
+                    },
+                    buttonNumberClick = {
+
+                    },
+                    buttonIconClick = {
+
+                    }
+                )
             }
         }
     }
@@ -29,10 +43,21 @@ class MainActivity : ComponentActivity() {
 
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Preview(name = "Light", uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)
-
 @Composable
-fun GreetingPreview() {
+fun MainActivityContentPreview() {
     PhoneNumberExampleTheme {
-        PhoneDialPadScreen()
+        var currentInputText = remember { TextFieldValue("") }
+        PhoneDialPadScreen(
+            value = currentInputText,
+            onValueChange = { newValue ->
+                currentInputText = newValue
+            },
+            buttonNumberClick = {
+
+            },
+            buttonIconClick = {
+
+            }
+        )
     }
 }

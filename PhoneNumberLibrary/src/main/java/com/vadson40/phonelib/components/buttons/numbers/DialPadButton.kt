@@ -36,9 +36,9 @@ import com.vadson40.phonelib.theme.defaultTextStyle
 internal fun DialPadButton(
     modifier: Modifier = Modifier,
     label: String,
-    backgroundColor: Color = MaterialTheme.colorScheme.background,
-    indicatorColor: Color = MaterialTheme.colorScheme.onSurface,
-    textStyle: TextStyle = defaultTextStyle(),
+    backgroundColor: Color? = null,
+    indicatorColor: Color? = null,
+    textStyle: TextStyle? = null,
     onClick: () -> Unit
 ) {
     Box(
@@ -49,13 +49,13 @@ internal fun DialPadButton(
                 indication = ripple(
                     bounded = true,
                     radius = 42.dp,
-                    color = indicatorColor
+                    color = indicatorColor ?: MaterialTheme.colorScheme.onSurface
                 ),
                 interactionSource = remember { MutableInteractionSource() }
             )
             .aspectRatio(1f)
             .background(
-                color = backgroundColor,
+                color = backgroundColor ?: MaterialTheme.colorScheme.background,
                 shape = CircleShape
             ),
         contentAlignment = Alignment.Center
@@ -63,7 +63,7 @@ internal fun DialPadButton(
         Text(
             modifier = Modifier,
             text = label,
-            style = textStyle
+            style = textStyle ?: defaultTextStyle()
         )
     }
 }
