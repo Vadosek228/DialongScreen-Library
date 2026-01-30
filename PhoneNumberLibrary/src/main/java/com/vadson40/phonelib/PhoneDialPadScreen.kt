@@ -2,6 +2,7 @@ package com.vadson40.phonelib
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +12,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,14 +26,36 @@ import com.vadson40.phonelib.components.buttons.icons.DialPadIconButtonVO
 import com.vadson40.phonelib.components.buttons.numbers.DialPadButton
 import com.vadson40.phonelib.components.textfields.DialPadPhoneInputField
 import com.vadson40.phonelib.theme.PhoneDialPadLibraryTheme
-import com.vadson40.phonelib.utils.Constants
 import com.vadson40.phonelib.utils.defaultIconButtonsList
 import com.vadson40.phonelib.utils.defaultNumberList
 
 //todo поправить доку
-//todo поправить работу с индикатором
 //todo поправить preview для Main activity чтобы работала иконка
-//todo добавить скрытие клавиатуры
+
+
+data class PhoneInputFieldState(
+    val modifier: Modifier = Modifier,
+    val textStyle: TextStyle? = null,
+    val setInitFocus: Boolean = true,
+    val visualTransformation: VisualTransformation? = null,
+    val useDefaultVisualTransformation: Boolean = true,
+    val cursorBrush: SolidColor? = null
+)
+
+data class ButtonNumberListState(
+    val modifier: Modifier = Modifier,
+    val list: List<String>? = null,
+    val background: Color? = null,
+    val indicatorColor: Color? = null,
+    val textStyle: TextStyle? = null,
+)
+
+data class ButtonIconListState(
+    val modifier: Modifier = Modifier,
+    val list: List<DialPadIconButtonVO?>? = null,
+    val background: Color? = null,
+    val indicatorColor: Color? = null
+)
 
 /**
  * Экран для набора номера.
@@ -73,16 +95,23 @@ fun PhoneDialPadScreen(
             verticalArrangement = Arrangement.Bottom
         ) {
 
-            DialPadPhoneInputField(
-                modifier = inputFieldModifier,
-                value = value,
-                onValueChange = onValueChange,
-                textStyle = inputFieldTextStyle,
-                setInitFocus = setInitFocus,
-                visualTransformation = visualTransformation,
-                useDefaultVisualTransformation = useDefaultVisualTransformation,
-                cursorBrush = cursorBrush
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(0.5f),
+                contentAlignment = Alignment.Center
+            ) {
+                DialPadPhoneInputField(
+                    modifier = inputFieldModifier,
+                    value = value,
+                    onValueChange = onValueChange,
+                    textStyle = inputFieldTextStyle,
+                    setInitFocus = setInitFocus,
+                    visualTransformation = visualTransformation,
+                    useDefaultVisualTransformation = useDefaultVisualTransformation,
+                    cursorBrush = cursorBrush
+                )
+            }
 
             DialPadPanel(
                 modifier = dialPadModifier,
@@ -168,18 +197,11 @@ private fun DialPadPanel(
 @Composable
 private fun PhoneDialPadScreenPreview() {
     PhoneDialPadLibraryTheme {
-        var currentInputText = remember { TextFieldValue(Constants.EMPTY) }
         PhoneDialPadScreen(
-            value = currentInputText,
-            onValueChange = { newValue ->
-                currentInputText = newValue
-            },
-            buttonNumberClick = {
-
-            },
-            buttonIconClick = {
-
-            }
+            value = TextFieldValue("79009009999"),
+            onValueChange = { _ -> },
+            buttonNumberClick = {},
+            buttonIconClick = {}
         )
     }
 }

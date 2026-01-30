@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vadson40.phonelib.theme.PhoneDialPadLibraryTheme
 import com.vadson40.phonelib.theme.defaultTextStyle
+import com.vadson40.phonelib.utils.DisableSoftKeyboard
 import com.vadson40.phonelib.utils.PhoneMaskTransformation
 
 /**
@@ -53,34 +54,42 @@ internal fun DialPadPhoneInputField(
     cursorBrush: SolidColor? = null
 ) {
     val focusRequest = FocusRequester()
-    LaunchedEffect(setInitFocus) {
-        focusRequest.requestFocus()
+    LaunchedEffect(Unit) {
+        if (setInitFocus) {
+            focusRequest.requestFocus()
+        }
     }
 
-    BasicTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .background(Color.Transparent)
-            .then(modifier)
-            .focusRequester(focusRequest)
-            .onFocusChanged { focusState ->
-                if (!focusState.isFocused && setInitFocus)
-                    focusRequest.freeFocus()
+    DisableSoftKeyboard(
+        disable = true
+    ) {
+        BasicTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 24.dp)
+                .padding(horizontal = 16.dp)
+                .background(Color.Transparent)
+                .then(modifier)
+                .focusRequester(focusRequest)
+                .onFocusChanged { focusState ->
+                    if (!focusState.isFocused)
+                        focusRequest.requestFocus()
+                },
+            value = value,
+            onValueChange = { newValue ->
+                onValueChange(newValue)
             },
-        value = value,
-        onValueChange = { newValue ->
-            onValueChange(newValue)
-        },
-        textStyle = textStyle ?: defaultTextStyle(),
-        cursorBrush = cursorBrush ?: SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
-        visualTransformation = visualTransformation ?: if (useDefaultVisualTransformation) PhoneMaskTransformation else VisualTransformation.None,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
+            textStyle = textStyle ?: defaultTextStyle(),
+            cursorBrush = cursorBrush ?: SolidColor(MaterialTheme.colorScheme.onSurfaceVariant),
+            visualTransformation = visualTransformation
+                ?: if (useDefaultVisualTransformation) PhoneMaskTransformation else VisualTransformation.None,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            )
         )
-    )
+    }
 }
 
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
