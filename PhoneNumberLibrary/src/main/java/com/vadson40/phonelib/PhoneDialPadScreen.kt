@@ -12,6 +12,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,10 +32,16 @@ import com.vadson40.phonelib.theme.PhoneDialPadLibraryTheme
 import com.vadson40.phonelib.utils.defaultIconButtonsList
 import com.vadson40.phonelib.utils.defaultNumberList
 
-//todo поправить доку
-//todo поправить preview для Main activity чтобы работала иконка
-
-
+/**
+ * Состояние поля ввода телефонного номера.
+ *
+ * @param modifier - модификатор
+ * @param textStyle - стиль текста
+ * @param setInitFocus - установить первоначальный фокус на элементе
+ * @param visualTransformation - визуальная трансформация телефонного номера
+ * @param useDefaultVisualTransformation - применить визуальную трансформацию телефонного номера по умолчанию
+ * @param cursorBrush - стиль курсора
+ */
 data class PhoneInputFieldState(
     val modifier: Modifier = Modifier,
     val textStyle: TextStyle? = null,
@@ -40,22 +49,63 @@ data class PhoneInputFieldState(
     val visualTransformation: VisualTransformation? = null,
     val useDefaultVisualTransformation: Boolean = true,
     val cursorBrush: SolidColor? = null
-)
+) {
+    companion object {
+        val Default = PhoneInputFieldState(
+            modifier = Modifier,
+            textStyle = null,
+            setInitFocus = true,
+            visualTransformation = null,
+            useDefaultVisualTransformation = true,
+            cursorBrush = null
+        )
+    }
+}
 
+/**
+ * Состояние для грида с числовыми или симвоьными кнопками.
+ *
+ * @param modifier - модификатор для кнопок
+ * @param list - список кнопок с символами, по умолчанию null и примениться дефолтные
+ * @param background - задний фон для каждой кнопки
+ * @param indicatorColor - цвет индикатора нажатия для каждой кнопки
+ * @param textStyle - стиль текста для кнопки
+ */
 data class ButtonNumberListState(
     val modifier: Modifier = Modifier,
     val list: List<String>? = null,
     val background: Color? = null,
     val indicatorColor: Color? = null,
     val textStyle: TextStyle? = null,
-)
+) {
+    companion object {
+        val Default = ButtonNumberListState(
+            modifier = Modifier,
+            list = null,
+            background = null,
+            indicatorColor = null,
+            textStyle = null
+        )
+    }
+}
 
+/**
+ * Состояние грида со списком кнопок с иконками.
+ *
+ * @param modifier - модификатор
+ * @param list - список кнопок с иконками, ставить null, чтобы применилось по умолчанию
+ */
 data class ButtonIconListState(
     val modifier: Modifier = Modifier,
-    val list: List<DialPadIconButtonVO?>? = null,
-    val background: Color? = null,
-    val indicatorColor: Color? = null
-)
+    val list: List<DialPadIconButtonVO?>? = null
+) {
+    companion object {
+        val Default = ButtonIconListState(
+            modifier = Modifier,
+            list = null
+        )
+    }
+}
 
 /**
  * Экран для набора номера.
@@ -63,25 +113,26 @@ data class ButtonIconListState(
  * Содержит два элемента:
  * 1) Поле ввода номера телефона, которое поддерживает работу с курсором, вставку, вырезать и выделить все элементы.
  * 2) Панель для ввода чисел и символов.
+ *
+ * @param modifier - модификатор для экрана
+ * @param dialPadModifier - модификатор для панели с кнопками
+ * @param value - значение для отображения в поле ввода номера
+ * @param onValueChange - вернет новое значение при вставке
+ * @param inputFieldState - состояние поле ввода номера
+ * @param buttonNumberListState - состояние списка с кнопками
+ * @param buttonIconListState - состояние списка кнопок с иконками
+ * @param buttonNumberClick - обработчик нажатия на кнопку с числом или символом
+ * @param buttonIconClick - обработчик нажатия на кнопку с иконкой
  */
 @Composable
 fun PhoneDialPadScreen(
     modifier: Modifier = Modifier,
-    inputFieldModifier: Modifier = Modifier,
     dialPadModifier: Modifier = Modifier,
-    buttonModifier: Modifier = Modifier,
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    inputFieldTextStyle: TextStyle? = null,
-    setInitFocus: Boolean = true,
-    visualTransformation: VisualTransformation? = null,
-    useDefaultVisualTransformation: Boolean = true,
-    cursorBrush: SolidColor? = null,
-    buttonNumberList: List<String>? = null,
-    buttonIconList: List<DialPadIconButtonVO?>? = null,
-    buttonNumberBackground: Color? = null,
-    buttonNumberIndicator: Color? = null,
-    buttonNumberTextStyle: TextStyle? = null,
+    inputFieldState: PhoneInputFieldState = PhoneInputFieldState.Default,
+    buttonNumberListState: ButtonNumberListState = ButtonNumberListState.Default,
+    buttonIconListState: ButtonIconListState = ButtonIconListState.Default,
     buttonNumberClick: (String) -> Unit,
     buttonIconClick: (String) -> Unit
 ) {
@@ -102,25 +153,21 @@ fun PhoneDialPadScreen(
                 contentAlignment = Alignment.Center
             ) {
                 DialPadPhoneInputField(
-                    modifier = inputFieldModifier,
+                    modifier = inputFieldState.modifier,
                     value = value,
                     onValueChange = onValueChange,
-                    textStyle = inputFieldTextStyle,
-                    setInitFocus = setInitFocus,
-                    visualTransformation = visualTransformation,
-                    useDefaultVisualTransformation = useDefaultVisualTransformation,
-                    cursorBrush = cursorBrush
+                    textStyle = inputFieldState.textStyle,
+                    setInitFocus = inputFieldState.setInitFocus,
+                    visualTransformation = inputFieldState.visualTransformation,
+                    useDefaultVisualTransformation = inputFieldState.useDefaultVisualTransformation,
+                    cursorBrush = inputFieldState.cursorBrush
                 )
             }
 
             DialPadPanel(
                 modifier = dialPadModifier,
-                buttonModifier = buttonModifier,
-                buttonNumberList = buttonNumberList ?: defaultNumberList(),
-                buttonNumberBackground = buttonNumberBackground,
-                buttonNumberIndicator = buttonNumberIndicator,
-                buttonNumberTextStyle = buttonNumberTextStyle,
-                buttonIconList = buttonIconList ?: defaultIconButtonsList(),
+                buttonNumberListState = buttonNumberListState,
+                buttonIconListState = buttonIconListState,
                 buttonNumberClick = buttonNumberClick,
                 buttonIconClick = buttonIconClick
             )
@@ -133,27 +180,22 @@ fun PhoneDialPadScreen(
  * Также содержит кнопки с иконками, возможно использовать свои.
  *
  * @param modifier - модификатор для панели
- * @param buttonModifier - модификатор для кнопок
- * @param buttonNumberList - список кнопок с числами или символами
- * @param buttonNumberBackground - цвет кнопки с числом или символом
- * @param buttonNumberIndicator - цвет индикатора нажатия кнопки
- * @param buttonNumberTextStyle - стиль текста для кнопки с числом или символом
- * @param buttonIconList - список кнопок с иконками
+ * @param buttonNumberListState - состояние для отображение кнопок к номерами или символами
+ * @param buttonIconListState - состояние для отображения кнопок с иноками
  * @param buttonNumberClick - обработчик клика по кнопке с номером, вернет символ для кнопки
  * @param buttonIconClick - обработчик клика по кнопке с иконкой, вернет id кнопки
  */
 @Composable
 private fun DialPadPanel(
     modifier: Modifier,
-    buttonModifier: Modifier,
-    buttonNumberList: List<String>,
-    buttonNumberBackground: Color? = null,
-    buttonNumberIndicator: Color? = null,
-    buttonNumberTextStyle: TextStyle? = null,
-    buttonIconList: List<DialPadIconButtonVO?>,
+    buttonNumberListState: ButtonNumberListState,
+    buttonIconListState: ButtonIconListState,
     buttonNumberClick: (String) -> Unit,
     buttonIconClick: (String) -> Unit
 ) {
+    val numberList by remember { mutableStateOf(buttonNumberListState.list ?: defaultNumberList()) }
+    val iconsList by remember { mutableStateOf(buttonIconListState.list ?: defaultIconButtonsList()) }
+
     Column {
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
@@ -164,23 +206,23 @@ private fun DialPadPanel(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            items(buttonNumberList) { char ->
+            items(numberList) { char ->
                 DialPadButton(
-                    modifier = modifier,
+                    modifier = buttonNumberListState.modifier,
                     label = char,
-                    backgroundColor = buttonNumberBackground,
-                    indicatorColor = buttonNumberIndicator,
-                    textStyle = buttonNumberTextStyle,
+                    backgroundColor = buttonNumberListState.background,
+                    indicatorColor = buttonNumberListState.indicatorColor,
+                    textStyle = buttonNumberListState.textStyle,
                     onClick = {
                         buttonNumberClick(char)
                     }
                 )
             }
 
-            items(buttonIconList) { item ->
+            items(iconsList) { item ->
                 item?.let {
                     DialPadIconButton(
-                        modifier = buttonModifier,
+                        modifier = buttonIconListState.modifier,
                         data = item,
                         onClick = {
                             buttonIconClick.invoke(item.id)

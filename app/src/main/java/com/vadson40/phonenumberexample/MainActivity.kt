@@ -20,6 +20,10 @@ import com.vadson40.phonelib.utils.deleteSymbolAtTheCursorPosition
 import com.vadson40.phonelib.utils.removeUnnecessarySymbolFromPhoneNumber
 import com.vadson40.phonenumberexample.ui.theme.PhoneNumberExampleTheme
 
+//todo поправить preview для Main activity чтобы работала иконка
+//todo сделать readme
+//todo сделать побольше кейсов
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
