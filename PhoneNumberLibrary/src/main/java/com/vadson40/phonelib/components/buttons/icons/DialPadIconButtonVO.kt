@@ -11,10 +11,12 @@ import com.vadson40.phonelib.R
 /**
  * Описывает данные для кнопки с иконкой.
  *
+ * @param id - идентификатор кнопки, для дальнейшего использования. Можно вставлять enum, для лаконичности.
  * @param icon - [Image] для иконки
  * @param indicatorColor - цвет индикатора нажатия на кнопку
  */
 data class DialPadIconButtonVO(
+    val id: String,
     val icon: Image,
     val indicatorColor: Color? = null
 ) {
@@ -23,9 +25,26 @@ data class DialPadIconButtonVO(
     internal fun indicatorColorGetColorOrDefault() =
         indicatorColor ?: MaterialTheme.colorScheme.onSurface
 
+    /**
+     * Тип для кнопок с иконками по умолчанию.
+     * Если не используете свой список.
+     */
+    enum class DefaultIconButtonType {
+        /**
+         * Совершение звонка.
+         */
+        CALL,
+
+        /**
+         * Удаление символа.
+         */
+        DELETE
+    }
+
     companion object {
 
         val call = DialPadIconButtonVO(
+            id = DefaultIconButtonType.CALL.name,
             icon = Image.IconRes(
                 res = R.drawable.ic_phone,
                 contentDescription = "Кнопка вызова",
@@ -35,6 +54,7 @@ data class DialPadIconButtonVO(
         )
 
         val delete = DialPadIconButtonVO(
+            id = DefaultIconButtonType.DELETE.name,
             icon = Image.IconVector(
                 icon = Icons.Outlined.Delete,
                 contentDescription = "Кнопка удаления",

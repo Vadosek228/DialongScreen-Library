@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -34,6 +33,7 @@ import com.vadson40.phonelib.utils.defaultNumberList
 //todo поправить доку
 //todo поправить работу с индикатором
 //todo поправить preview для Main activity чтобы работала иконка
+//todo добавить скрытие клавиатуры
 
 /**
  * Экран для набора номера.
@@ -61,7 +61,7 @@ fun PhoneDialPadScreen(
     buttonNumberIndicator: Color? = null,
     buttonNumberTextStyle: TextStyle? = null,
     buttonNumberClick: (String) -> Unit,
-    buttonIconClick: (Int) -> Unit
+    buttonIconClick: (String) -> Unit
 ) {
     Scaffold { innerPadding ->
         Column(
@@ -111,7 +111,7 @@ fun PhoneDialPadScreen(
  * @param buttonNumberTextStyle - стиль текста для кнопки с числом или символом
  * @param buttonIconList - список кнопок с иконками
  * @param buttonNumberClick - обработчик клика по кнопке с номером, вернет символ для кнопки
- * @param buttonIconClick - обработчик клика по кнопке с иконкой, вернет индекс кнопки
+ * @param buttonIconClick - обработчик клика по кнопке с иконкой, вернет id кнопки
  */
 @Composable
 private fun DialPadPanel(
@@ -123,7 +123,7 @@ private fun DialPadPanel(
     buttonNumberTextStyle: TextStyle? = null,
     buttonIconList: List<DialPadIconButtonVO?>,
     buttonNumberClick: (String) -> Unit,
-    buttonIconClick: (Int) -> Unit
+    buttonIconClick: (String) -> Unit
 ) {
     Column {
         LazyVerticalGrid(
@@ -148,13 +148,13 @@ private fun DialPadPanel(
                 )
             }
 
-            itemsIndexed(buttonIconList) { index, item ->
+            items(buttonIconList) { item ->
                 item?.let {
                     DialPadIconButton(
                         modifier = buttonModifier,
                         data = item,
                         onClick = {
-                            buttonIconClick.invoke(index)
+                            buttonIconClick.invoke(item.id)
                         }
                     )
                 }

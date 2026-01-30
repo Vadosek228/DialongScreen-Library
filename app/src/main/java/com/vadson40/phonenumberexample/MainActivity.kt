@@ -2,19 +2,22 @@ package com.vadson40.phonenumberexample
 
 import android.content.res.Configuration
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import com.vadson40.phonelib.PhoneDialPadScreen
+import com.vadson40.phonelib.components.buttons.icons.DialPadIconButtonVO.DefaultIconButtonType
+import com.vadson40.phonelib.utils.addSymbolAtTheCursorPosition
+import com.vadson40.phonelib.utils.deleteSymbolAtTheCursorPosition
+import com.vadson40.phonelib.utils.removeUnnecessarySymbolFromPhoneNumber
 import com.vadson40.phonenumberexample.ui.theme.PhoneNumberExampleTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,17 +26,26 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PhoneNumberExampleTheme {
-                var currentInputText = remember { TextFieldValue("") }
+                var currentInputText by remember { mutableStateOf(TextFieldValue()) }
                 PhoneDialPadScreen(
                     value = currentInputText,
                     onValueChange = { newValue ->
-                        currentInputText = newValue
+                        currentInputText = newValue.removeUnnecessarySymbolFromPhoneNumber()
                     },
-                    buttonNumberClick = {
-
+                    buttonNumberClick = { newSymbol ->
+                        currentInputText =
+                            currentInputText.addSymbolAtTheCursorPosition(newSymbol)
                     },
-                    buttonIconClick = {
-
+                    buttonIconClick = { buttonId ->
+                        when (buttonId) {
+                            DefaultIconButtonType.CALL.name -> {
+                                Toast.makeText(this, "Call: ${currentInputText.text}", Toast.LENGTH_SHORT).show()
+                            }
+                            DefaultIconButtonType.DELETE.name -> {
+                                currentInputText =
+                                    currentInputText.deleteSymbolAtTheCursorPosition()
+                            }
+                        }
                     }
                 )
             }
@@ -46,18 +58,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainActivityContentPreview() {
     PhoneNumberExampleTheme {
-        var currentInputText = remember { TextFieldValue("") }
         PhoneDialPadScreen(
-            value = currentInputText,
-            onValueChange = { newValue ->
-                currentInputText = newValue
-            },
-            buttonNumberClick = {
-
-            },
-            buttonIconClick = {
-
-            }
+            value = TextFieldValue(""),
+            onValueChange = { _ -> },
+            buttonNumberClick = {},
+            buttonIconClick = {}
         )
     }
 }
