@@ -52,7 +52,10 @@ dependencies {
     implementation(libs.androidx.compose.material3)
 
     //local impl
-    implementation(project(":PhoneNumberLibrary"))
+//    implementation(project(":PhoneNumberLibrary"))
+
+    //public libs
+    implementation("com.github.Vadosek228:DialongScreen-Library:v.1.0.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
