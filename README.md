@@ -9,7 +9,7 @@ and provides the ability to customize this screen according to your needs.
 With this library, you'll be able to easily integrate a phone number input screen into your application.
 It offers features such as editing the input field and customizing the text cursor appearance.
 
-![img.png](img.png)
+![img.png]([img.png](https://github.com/user-attachments/assets/868718f2-345c-4600-9045-723a66eee3d4))
 ![img_1.png](img_1.png)
 
 ## Sample project
